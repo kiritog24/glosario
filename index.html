@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glosario de Seguridad Informática</title>
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --accent-color: #4895ef;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --gray-color: #6c757d;
+      --success-color: #4bb543;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7ff;
+      color: var(--dark-color);
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 2rem 0;
+      text-align: center;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-weight: 300;
+    }
+    
+    .search-container {
+      position: relative;
+      margin-bottom: 2rem;
+    }
+    
+    #search {
+      width: 100%;
+      padding: 15px 20px;
+      font-size: 1rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 50px;
+      outline: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    #search:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+    }
+    
+    .search-icon {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-color);
+    }
+    
+    .glosario-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .termino-card {
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .termino-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+    
+    .termino-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1rem 1.5rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .termino-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    
+    .termino-icon {
+      transition: transform 0.3s ease;
+    }
+    
+    .termino-card.active .termino-icon {
+      transform: rotate(180deg);
+    }
+    
+    .termino-content {
+      padding: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+    
+    .termino-card.active .termino-content {
+      padding: 1.5rem;
+      max-height: 500px;
+    }
+    
+    .termino-definicion {
+      margin-bottom: 1rem;
+      color: var(--dark-color);
+    }
+    
+    .termino-categoria {
+      display: inline-block;
+      background-color: var(--accent-color);
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+    }
+    
+    .no-results {
+      text-align: center;
+      grid-column: 1 / -1;
+      padding: 2rem;
+      color: var(--gray-color);
+    }
+    
+    footer {
+      text-align: center;
+      padding: 2rem 0;
+      color: var(--gray-color);
+      font-size: 0.9rem;
+    }
+    
+    @media (max-width: 768px) {
+      .glosario-container {
+        grid-template-columns: 1fr;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Glosario de Seguridad Informática</h1>
+      <p class="subtitle">Definiciones clave para entender la ciberseguridad</p>
+    </div>
+  </header>
+  
+  <div class="container">
+    <div class="search-container">
+      <input type="text" id="search" placeholder="Buscar término...">
+      <span class="search-icon">🔍</span>
+    </div>
+    
+    <div class="glosario-container" id="glosario"></div>
+  </div>
+  
+  <footer>
+    <div class="container">
+      <p>© 2023 Glosario de Seguridad Informática | Todos los derechos reservados</p>
+    </div>
+  </footer>
+
+  <script>
+    const terminos = [
+      {
+        termino: "Administración Electrónica",
+        definicion: "Uso de tecnologías de la información y comunicación por parte de las administraciones públicas para mejorar los servicios ofrecidos a los ciudadanos y empresas.",
+        categoria: "Gobierno Digital"
+      },
+      {
+        termino: "Adware",
+        definicion: "Software que muestra publicidad no deseada, a menudo instalado sin el consentimiento del usuario. Puede rastrear hábitos de navegación para mostrar anuncios dirigidos.",
+        categoria: "Malware"
+      },
+      {
+        termino: "AES (Advanced Encryption Standard)",
+        definicion: "Algoritmo de cifrado simétrico adoptado como estándar por el gobierno de EE.UU. para proteger información clasificada. Usa tamaños de clave de 128, 192 o 256 bits.",
+        categoria: "Criptografía"
+      },
+      {
+        termino: "Agujero de seguridad",
+        definicion: "Vulnerabilidad o fallo en un sistema que puede ser explotado para comprometer su seguridad. También conocido como vulnerabilidad o brecha de seguridad.",
+        categoria: "Vulnerabilidades"
+      },
+      {
+        termino: "Algoritmos de cifrado",
+        definicion: "Conjunto de reglas matemáticas utilizadas para cifrar y descifrar información. Pueden ser simétricos (misma clave) o asimétricos (clave pública/privada).",
+        categoria: "Criptografía"
+      },
+      {
+        termino: "Amenaza",
+        definicion: "Cualquier circunstancia o evento con potencial de causar daño a un sistema informático mediante acceso no autorizado, destrucción, divulgación o modificación de datos.",
+        categoria: "Conceptos"
+      },
+      {
+        termino: "Análisis de riesgos",
+        definicion: "Proceso de identificar, evaluar y priorizar riesgos para la seguridad de la información, seguido de la aplicación coordinada de recursos para minimizar su impacto.",
+        categoria: "Gestión"
+      },
+      {
+        termino: "Análisis de vulnerabilidades",
+        definicion: "Proceso sistemático de identificar, cuantificar y priorizar las vulnerabilidades en sistemas informáticos, aplicaciones y redes.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Antispyware",
+        definicion: "Software diseñado para detectar y eliminar programas espía (spyware) que recopilan información personal sin consentimiento del usuario.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Antivirus",
+        definicion: "Programa diseñado para detectar, prevenir y eliminar software malicioso como virus, gusanos y troyanos mediante firmas y análisis heurístico.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Ataque activo",
+        definicion: "Intento deliberado de alterar un sistema o afectar su funcionamiento normal, como modificar datos o interrumpir servicios, en contraste con un ataque pasivo que solo observa.",
+        categoria: "Ataques"
+      },
+      {
+        termino: "Auditoría de seguridad",
+        definicion: "Evaluación sistemática de la seguridad de un sistema informático mediante la medición de su cumplimiento con estándares establecidos y la identificación de vulnerabilidades.",
+        categoria: "Gestión"
+      },
+      {
+        termino: "Autenticación",
+        definicion: "Proceso de verificar la identidad de un usuario, sistema o entidad, típicamente mediante algo que sabe (contraseña), tiene (token) o es (biometría).",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Autenticidad",
+        definicion: "Propiedad que garantiza que un mensaje, transacción o dato proviene efectivamente de la fuente que dice provenir y no ha sido alterado.",
+        categoria: "Conceptos"
+      },
+      {
+        termino: "Autoridad de certificación (CA)",
+        definicion: "Entidad confiable que emite certificados digitales verificando la identidad de personas u organizaciones para propósitos de seguridad en comunicaciones digitales.",
+        categoria: "PKI"
+      },
+      {
+        termino: "Autoridad de registro (RA)",
+        definicion: "Entidad responsable de verificar las identidades de los solicitantes antes de que una autoridad de certificación emita un certificado digital.",
+        categoria: "PKI"
+      },
+      {
+        termino: "Aviso Legal",
+        definicion: "Texto que establece las condiciones de uso de un sitio web, responsabilidades del propietario y derechos de los usuarios, cumpliendo con requisitos legales como la LSSI.",
+        categoria: "Legal"
+      },
+      {
+        termino: "Backup",
+        definicion: "Copia de seguridad de datos que permite restaurar la información original después de una pérdida de datos por fallos técnicos, errores humanos o ataques maliciosos.",
+        categoria: "Continuidad"
+      },
+      {
+        termino: "Bastionado",
+        definicion: "Proceso de endurecimiento (hardening) de un sistema mediante la eliminación de servicios innecesarios, actualizaciones y configuración segura para reducir su superficie de ataque.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Bluetooth",
+        definicion: "Tecnología de comunicación inalámbrica de corto alcance susceptible a ataques como Bluejacking (envío no consentido) o Bluesnarfing (robo de datos).",
+        categoria: "Redes"
+      },
+      {
+        termino: "Borrado seguro",
+        definicion: "Método para eliminar datos de forma irreversible mediante sobrescritura múltiple, asegurando que no puedan recuperarse con herramientas forenses.",
+        categoria: "Privacidad"
+      },
+      {
+        termino: "Botnet",
+        definicion: "Red de dispositivos infectados (bots o zombis) controlados remotamente por un atacante (botmaster) para realizar actividades maliciosas como DDoS o spam.",
+        categoria: "Malware"
+      },
+      {
+        termino: "Bots",
+        definicion: "Programas automatizados que realizan tareas repetitivas en internet, que pueden ser benignos (rastreadores web) o maliciosos (parte de botnets).",
+        categoria: "Malware"
+      },
+      {
+        termino: "Brecha de seguridad",
+        definicion: "Incidente de seguridad que resulta en acceso, destrucción, pérdida o alteración no autorizada de datos personales transmitidos, almacenados o procesados.",
+        categoria: "Incidentes"
+      },
+      {
+        termino: "Cadena de custodia",
+        definicion: "Procedimiento documentado que registra quién ha manejado evidencia digital desde su recolección hasta su presentación en corte, crucial en investigaciones forenses.",
+        categoria: "Forense"
+      },
+      {
+        termino: "Captcha",
+        definicion: "Prueba desafío-respuesta para distinguir humanos de bots, protegiendo sistemas contra automatización maliciosa. Ejemplo: identificar letras distorsionadas.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Centro de respaldo",
+        definicion: "Instalación alternativa que permite continuar operaciones críticas durante desastres, puede ser hot site (operativo inmediatamente) o cold site (requiere configuración).",
+        categoria: "Continuidad"
+      },
+      {
+        termino: "Certificado de autenticidad",
+        definicion: "Documento digital que verifica la legitimidad de un producto software, confirmando que no ha sido alterado y proviene del desarrollador original.",
+        categoria: "PKI"
+      },
+      {
+        termino: "Certificado digital",
+        definicion: "Archivo electrónico que asocia una identidad con una clave pública, emitido por una autoridad de certificación y usado para autenticación y cifrado.",
+        categoria: "PKI"
+      },
+      {
+        termino: "Cesión de datos",
+        definicion: "Comunicación de datos personales a terceros con fines específicos, que debe informarse al interesado según leyes de protección de datos como el GDPR o LOPDGDD.",
+        categoria: "Legal"
+      },
+      {
+        termino: "Ciberataque",
+        definicion: "Acción deliberada para explotar sistemas informáticos, redes o infraestructuras digitales con intenciones maliciosas como robo de datos, extorsión o sabotaje.",
+        categoria: "Ataques"
+      },
+      {
+        termino: "Ciberdelincuente",
+        definicion: "Individuo u organización que comete actividades ilícitas mediante el uso de tecnologías de la información, como fraude, robo de identidad o distribución de malware.",
+        categoria: "Conceptos"
+      },
+      {
+        termino: "Ciberejercicio",
+        definicion: "Simulación de incidentes de seguridad para evaluar y mejorar la preparación de una organización ante ciberataques reales, probando planes de respuesta.",
+        categoria: "Gestión"
+      },
+      {
+        termino: "Cifrado",
+        definicion: "Proceso de transformar información legible (texto plano) en formato ilegible (texto cifrado) usando algoritmos criptográficos para proteger su confidencialidad.",
+        categoria: "Criptografía"
+      },
+      {
+        termino: "Cifrado asimétrico",
+        definicion: "Sistema criptográfico que usa dos claves matemáticamente relacionadas: una pública para cifrar y una privada para descifrar, también llamado criptografía de clave pública.",
+        categoria: "Criptografía"
+      },
+      {
+        termino: "Cifrado de extremo a extremo",
+        definicion: "Método de comunicación donde solo los usuarios finales pueden leer los mensajes, imposibilitando el acceso por intermediarios como proveedores de servicio.",
+        categoria: "Criptografía"
+      },
+      {
+        termino: "Clave privada",
+        definicion: "Componente secreto de un par de claves en criptografía asimétrica, usado para descifrar datos o crear firmas digitales. Debe protegerse rigurosamente.",
+        categoria: "Criptografía"
+      },
+      {
+        termino: "Clave pública",
+        definicion: "Componente compartible de un par de claves en criptografía asimétrica, usada para cifrar datos o verificar firmas digitales. Se distribuye libremente.",
+        categoria: "Criptografía"
+      },
+      {
+        termino: "Cloud computing",
+        definicion: "Modelo que permite acceso bajo demanda a recursos informáticos compartidos (redes, servidores, almacenamiento) a través de internet, con modelos como IaaS, PaaS o SaaS.",
+        categoria: "Tecnología"
+      },
+      {
+        termino: "Códigos de conducta",
+        definicion: "Conjunto de directrices que establecen prácticas recomendadas para el tratamiento de datos personales en sectores específicos, según regulaciones como el GDPR.",
+        categoria: "Legal"
+      },
+      {
+        termino: "Confidencialidad",
+        definicion: "Propiedad que garantiza que la información solo es accesible a aquellos autorizados, uno de los pilares de la seguridad de la información junto con integridad y disponibilidad.",
+        categoria: "Conceptos"
+      },
+      {
+        termino: "Contraseña",
+        definicion: "Secreto compartido entre usuario y sistema para autenticación. Las robustas combinan longitud, complejidad y unicidad, y se gestionan mejor con administradores de contraseñas.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Control de acceso",
+        definicion: "Mecanismo que restringe qué usuarios o sistemas pueden acceder a recursos específicos bajo qué condiciones, implementando principios como mínimo privilegio.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Control parental",
+        definicion: "Herramientas software o hardware que permiten a padres supervisar y limitar el acceso de menores a contenido inapropiado en internet o dispositivos.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Cookie",
+        definicion: "Pequeño archivo que sitios web almacenan en el navegador para recordar información del usuario entre sesiones, reguladas por leyes como la LSSI y GDPR.",
+        categoria: "Web"
+      },
+      {
+        termino: "Copia de seguridad",
+        definicion: "Réplica de datos importantes que permite recuperarlos tras incidentes como fallos de hardware, ransomware o eliminación accidental. La regla 3-2-1 recomienda 3 copias, en 2 medios, 1 externo.",
+        categoria: "Continuidad"
+      },
+      {
+        termino: "Correo de suplantación",
+        definicion: "Mensaje de email que falsifica su origen para aparecer como legítimo, técnica usada en phishing para engañar destinatarios y robar información o distribuir malware.",
+        categoria: "Ataques"
+      },
+      {
+        termino: "Correo spam",
+        definicion: "Mensajes electrónicos no solicitados enviados masivamente, generalmente con fines publicitarios. Puede contener malware o enlaces de phishing.",
+        categoria: "Ataques"
+      },
+      {
+        termino: "Cortafuegos",
+        definicion: "Dispositivo o software que controla el tráfico de red entre redes con diferentes niveles de confianza basado en reglas predefinidas, bloqueando accesos no autorizados.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Cracker",
+        definicion: "Individuo que vulnera sistemas informáticos con fines maliciosos, a diferencia de los hackers éticos. El término enfatiza la intención ilegal o dañina.",
+        categoria: "Conceptos"
+      },
+      {
+        termino: "Credenciales",
+        definicion: "Conjunto de información que autentica la identidad de un usuario, típicamente nombre de usuario y contraseña, pero puede incluir certificados digitales o tokens.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Criptografía",
+        definicion: "Ciencia de proteger información mediante técnicas matemáticas que la transforman en formatos ilegibles excepto para destinatarios autorizados, usando algoritmos y claves.",
+        categoria: "Criptografía"
+      },
+      {
+        termino: "Criptomoneda",
+        definicion: "Medio digital de intercambio que usa criptografía para asegurar transacciones y controlar la creación de nuevas unidades, operando independientemente de bancos centrales.",
+        categoria: "Blockchain"
+      },
+      {
+        termino: "Criticidad",
+        definicion: "Medida de la importancia de un activo, sistema o información basada en el impacto que tendría su pérdida, alteración o indisponibilidad para la organización.",
+        categoria: "Gestión"
+      },
+      {
+        termino: "Cuarentena",
+        definicion: "Aislamiento de archivos o sistemas sospechosos de estar infectados para prevenir la propagación de malware mientras se analizan y tratan adecuadamente.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Cuentas predeterminadas",
+        definicion: "Credenciales de acceso preconfiguradas en sistemas y dispositivos que deben cambiarse inmediatamente tras la instalación, ya que son conocidas públicamente y explotables.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Datos personales",
+        definicion: "Cualquier información relacionada con una persona física identificada o identificable según regulaciones como el GDPR y LOPDGDD, sujetas a protección especial.",
+        categoria: "Legal"
+      },
+      {
+        termino: "Defacement",
+        definicion: "Ataque que modifica la apariencia de un sitio web sin permiso, generalmente para propagar mensajes políticos o demostrar habilidades técnicas, indicando una vulnerabilidad explotada.",
+        categoria: "Ataques"
+      },
+      {
+        termino: "Denegación de servicio (DoS)",
+        definicion: "Ataque que busca hacer un sistema o recurso inaccesible a usuarios legítimos, típicamente sobrecargándolo con solicitudes. La versión distribuida (DDoS) usa múltiples fuentes.",
+        categoria: "Ataques"
+      },
+      {
+        termino: "Denegación de servicio distribuida (DDoS)",
+        definicion: "Ataque DoS que utiliza múltiples sistemas comprometidos (como una botnet) para inundar el objetivo con tráfico desde numerosos orígenes, dificultando la mitigación.",
+        categoria: "Ataques"
+      },
+      {
+        termino: "Derecho al olvido",
+        definicion: "Facultad de los individuos a solicitar la eliminación de enlaces a información personal obsoleta o irrelevante en resultados de búsqueda, reconocido por el GDPR.",
+        categoria: "Legal"
+      },
+      {
+        termino: "Desbordamiento de búfer",
+        definicion: "Vulnerabilidad que ocurre cuando un programa escribe datos más allá de los límites de un búfer en memoria, permitiendo la ejecución de código malicioso.",
+        categoria: "Vulnerabilidades"
+      },
+      {
+        termino: "Descifrado",
+        definicion: "Proceso de convertir información cifrada a su forma legible original usando un algoritmo y clave apropiados, inverso al proceso de cifrado.",
+        categoria: "Criptografía"
+      },
+      {
+        termino: "Desmagnetizar",
+        definicion: "Proceso de eliminar datos de medios magnéticos como discos duros mediante la aplicación de un campo magnético fuerte, asegurando su destrucción irreversible.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Detección de anomalías",
+        definicion: "Técnicas para identificar patrones inusuales en tráfico de red o comportamiento de sistemas que puedan indicar intrusiones o actividades maliciosas.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Detección de incidentes",
+        definicion: "Proceso de identificar eventos de seguridad que pueden afectar negativamente a los sistemas o datos, utilizando herramientas como SIEM o IDS.",
+        categoria: "Incidentes"
+      },
+      {
+        termino: "Dirección IP",
+        definicion: "Identificador numérico único asignado a dispositivos en una red que usa el protocolo IP para comunicación. IPv4 usa 32 bits (ej. 192.168.1.1), IPv6 usa 128 bits.",
+        categoria: "Redes"
+      },
+      {
+        termino: "Dirección MAC",
+        definicion: "Identificador físico único de 48 bits asignado por el fabricante a interfaces de red, expresado en hexadecimal (ej. 00:1A:2B:3C:4D:5E), usado en comunicaciones de nivel de enlace.",
+        categoria: "Redes"
+      },
+      {
+        termino: "Doble factor de autenticación (2FA)",
+        definicion: "Método de autenticación que requiere dos pruebas diferentes de identidad, típicamente algo que sabes (contraseña) y algo que tienes (token o SMS).",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Dropper",
+        definicion: "Tipo de malware diseñado para instalar otros componentes maliciosos en un sistema comprometido, evitando detección al separar la infección en etapas.",
+        categoria: "Malware"
+      },
+      {
+        termino: "Envenenamiento del DNS",
+        definicion: "Ataque que corrompe las entradas de un servidor DNS para redirigir tráfico legítimo a sitios maliciosos, explotando vulnerabilidades en la resolución de nombres.",
+        categoria: "Ataques"
+      },
+      {
+        termino: "Equipo azul",
+        definicion: "Grupo de defensa en ejercicios de seguridad cibernética, responsable de proteger sistemas y detectar actividades del equipo rojo (atacantes).",
+        categoria: "Ejercicios"
+      },
+      {
+        termino: "Equipo rojo",
+        definicion: "Grupo de ataque en ejercicios de seguridad cibernética que simula adversarios reales para probar las defensas del equipo azul mediante técnicas de penetración.",
+        categoria: "Ejercicios"
+      },
+      {
+        termino: "Escalada de privilegios",
+        definicion: "Técnica donde un atacante obtiene acceso no autorizado a mayores niveles de permisos en un sistema, explotando vulnerabilidades o configuraciones erróneas.",
+        categoria: "Ataques"
+      },
+      {
+        termino: "Escaneo de puertos",
+        definicion: "Técnica para descubrir puertos abiertos en un sistema que pueden indicar servicios vulnerables. Herramientas como Nmap automatizan este proceso para administradores y atacantes.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Escaneo de vulnerabilidades",
+        definicion: "Proceso automatizado de identificar, clasificar y priorizar vulnerabilidades en sistemas, redes o aplicaciones mediante herramientas especializadas como Nessus o OpenVAS.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Esteganografía",
+        definicion: "Técnica de ocultar información dentro de otros archivos (como imágenes o audio) sin alterar perceptiblemente el archivo contenedor, usada para comunicación encubierta.",
+        categoria: "Criptografía"
+      },
+      {
+        termino: "Fichero ejecutable",
+        definicion: "Archivo que contiene instrucciones que una computadora puede ejecutar directamente, potencial vector de malware si proviene de fuentes no confiables. Ejemplos: .exe, .bat, .sh.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Filtrado de paquetes",
+        definicion: "Técnica de cortafuegos que examina paquetes de red y los permite o bloquea basado en reglas como direcciones IP, puertos o protocolos.",
+        categoria: "Redes"
+      },
+      {
+        termino: "Firma antivirus",
+        definicion: "Patrón único que identifica un malware específico, usado por software antivirus para detectar infecciones conocidas. Requiere actualizaciones frecuentes para ser efectivo.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Firma electrónica",
+        definicion: "Conjunto de datos electrónicos que identifica al firmante y asegura la integridad del documento firmado, con validez legal equivalente a la firma manuscrita según regulaciones como eIDAS.",
+        categoria: "Legal"
+      },
+      {
+        termino: "Firmware",
+        definicion: "Software integrado en dispositivos hardware que controla su funcionamiento básico. Puede contener vulnerabilidades y requiere actualizaciones periódicas de seguridad.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Fuga de datos",
+        definicion: "Accidente o incidente de seguridad que resulta en exposición no autorizada de información confidencial, ya sea por errores internos o ataques externos.",
+        categoria: "Incidentes"
+      },
+      {
+        termino: "Gestión de incidentes",
+        definicion: "Proceso estructurado para identificar, analizar, contener, erradicar y recuperarse de incidentes de seguridad, incluyendo lecciones aprendidas para mejorar defensas.",
+        categoria: "Gestión"
+      },
+      {
+        termino: "Gestor de contraseñas",
+        definicion: "Aplicación que almacena y gestiona credenciales de acceso en una base de datos cifrada, permitiendo usar contraseñas complejas y únicas sin necesidad de recordarlas.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Hacker",
+        definicion: "Persona con conocimientos avanzados de informática que puede identificar y explotar vulnerabilidades en sistemas. Los 'white hat' usan estas habilidades éticamente, 'black hat' maliciosamente.",
+        categoria: "Conceptos"
+      },
+      {
+        termino: "Hacktivista",
+        definicion: "Individuo que usa habilidades de hacking para promover agendas políticas o sociales, a menudo mediante ataques a sitios web o fugas de información.",
+        categoria: "Conceptos"
+      },
+      {
+        termino: "HTTPS",
+        definicion: "Versión segura del protocolo HTTP que usa cifrado TLS/SSL para proteger la confidencialidad e integridad de datos entre el navegador y el servidor web.",
+        categoria: "Web"
+      },
+      {
+        termino: "Huella digital",
+        definicion: "1) Identificador único derivado de claves criptográficas o certificados. 2) Rastro dejado por actividades digitales que puede comprometer privacidad.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "IDS (Sistema de Detección de Intrusiones)",
+        definicion: "Herramienta que monitorea redes o sistemas en busca de actividades maliciosas o violaciones de políticas, generando alertas cuando detecta patrones sospechosos.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Incidente de seguridad",
+        definicion: "Evento adverso que compromete la confidencialidad, integridad o disponibilidad de sistemas o datos, como intrusiones, malware o fugas de información.",
+        categoria: "Incidentes"
+      },
+      {
+        termino: "Integridad",
+        definicion: "Propiedad que garantiza que la información no ha sido alterada de manera no autorizada, uno de los pilares fundamentales de la seguridad de la información.",
+        categoria: "Conceptos"
+      },
+      {
+        termino: "Intranet",
+        definicion: "Red privada dentro de una organización que usa tecnologías de internet (como HTTP y TCP/IP) para compartir información y recursos internamente de forma segura.",
+        categoria: "Redes"
+      },
+      {
+        termino: "Intrusión",
+        definicion: "Acceso no autorizado a sistemas, redes o datos, ya sea mediante explotación de vulnerabilidades, credenciales robadas u otros métodos de compromiso.",
+        categoria: "Ataques"
+      },
+      {
+        termino: "Inyección de código",
+        definicion: "Técnica de ataque donde un atacante inserta e ejecuta código malicioso en una aplicación vulnerable, explotando fallos como falta de validación de entradas.",
+        categoria: "Ataques"
+      },
+      {
+        termino: "Inyección SQL",
+        definicion: "Tipo de inyección de código donde se insertan sentencias SQL maliciosas en campos de entrada para manipular bases de datos, acceder a información no autorizada o causar daños.",
+        categoria: "Ataques"
+      },
+      {
+        termino: "IoT (Internet de las Cosas)",
+        definicion: "Red de dispositivos físicos (como sensores o electrodomésticos) conectados a internet, muchos con limitaciones de seguridad que los hacen vulnerables a ataques.",
+        categoria: "Tecnología"
+      },
+      {
+        termino: "IPS (Sistema de Prevención de Intrusiones)",
+        definicion: "Sistema que monitorea tráfico de red para detectar y bloquear actividades maliciosas en tiempo real, a diferencia de IDS que solo alerta.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Keylogger",
+        definicion: "Software o hardware malicioso que registra las pulsaciones de teclado para robar información confidencial como contraseñas o datos de tarjetas de crédito.",
+        categoria: "Malware"
+      },
+      {
+        termino: "Lista negra",
+        definicion: "1) Conjunto de direcciones IP, dominios o aplicaciones identificados como maliciosos y bloqueados proactivamente. 2) En seguridad de correo, direcciones de spam conocidas.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Login",
+        definicion: "Proceso de autenticación donde un usuario proporciona credenciales (como nombre de usuario y contraseña) para acceder a un sistema o aplicación.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "LOPDGDD",
+        definicion: "Ley Orgánica de Protección de Datos Personales y Garantía de Derechos Digitales, regulación española que adapta el GDPR y establece protecciones adicionales para datos personales.",
+        categoria: "Legal"
+      },
+      {
+        termino: "LSSI-CE",
+        definicion: "Ley de Servicios de la Sociedad de la Información y Comercio Electrónico, que regula obligaciones de prestadores de servicios online en España, incluyendo avisos legales y cookies.",
+        categoria: "Legal"
+      },
+      {
+        termino: "Man-in-the-Middle (MitM)",
+        definicion: "Ataque donde el atacante intercepta y posiblemente altera la comunicación entre dos partes sin su conocimiento, pudiendo robar información o inyectar datos maliciosos.",
+        categoria: "Ataques"
+      },
+      {
+        termino: "Metadatos",
+        definicion: "Datos que describen otros datos, como fecha de creación, autor o ubicación en fotos digitales, que pueden revelar información sensible aunque el contenido principal esté protegido.",
+        categoria: "Privacidad"
+      },
+      {
+        termino: "Mínimo privilegio",
+        definicion: "Principio de seguridad que establece que usuarios y sistemas deben tener solo los permisos necesarios para realizar sus tareas específicas, limitando el daño potencial de compromisos.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Mitigación",
+        definicion: "Acciones para reducir la probabilidad o impacto de riesgos de seguridad, como implementar controles técnicos, actualizar sistemas o capacitar empleados.",
+        categoria: "Gestión"
+      },
+      {
+        termino: "NGFW (Next-Generation Firewall)",
+        definicion: "Cortafuegos avanzado que combina capacidades tradicionales con funcionalidades como inspección de paquetes profundas, control de aplicaciones y prevención de intrusiones.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Ofuscar",
+        definicion: "Técnica de hacer código difícil de entender o analizar (sin cambiar su funcionalidad) para proteger propiedad intelectual o dificultar el análisis de malware.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Parche de seguridad",
+        definicion: "Actualización de software diseñada específicamente para corregir vulnerabilidades conocidas, que debe aplicarse prontamente para prevenir explotación por atacantes.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Pentest (Prueba de penetración)",
+        definicion: "Evaluación autorizada de seguridad donde especialistas simulan ataques reales contra sistemas para identificar vulnerabilidades antes que actores maliciosos las exploten.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "PGP (Pretty Good Privacy)",
+        definicion: "Programa de cifrado asimétrico ampliamente usado para seguridad en comunicaciones, permitiendo cifrado y firma digital de emails y archivos.",
+        categoria: "Criptografía"
+      },
+      {
+        termino: "Política de seguridad",
+        definicion: "Conjunto de reglas y procedimientos formales que definen cómo una organización protege sus recursos informáticos y gestiona riesgos asociados.",
+        categoria: "Gestión"
+      },
+      {
+        termino: "Privacidad",
+        definicion: "Derecho de los individuos a controlar cómo se recopila, usa y comparte su información personal, protegido por regulaciones como GDPR y LOPDGDD.",
+        categoria: "Legal"
+      },
+      {
+        termino: "Proveedor de acceso",
+        definicion: "Empresa que ofrece conexión a internet a usuarios finales, con responsabilidades según la LSSI como retener datos de tráfico o colaborar con autoridades.",
+        categoria: "Legal"
+      },
+      {
+        termino: "Repudio",
+        definicion: "Capacidad de un usuario para negar legítimamente participación en una comunicación o transacción, prevenida mediante mecanismos como firmas digitales y registros de auditoría.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Resiliencia",
+        definicion: "Capacidad de un sistema u organización para resistir, adaptarse y recuperarse rápidamente de incidentes de seguridad o interrupciones operacionales.",
+        categoria: "Gestión"
+      },
+      {
+        termino: "Respuesta de incidente",
+        definicion: "Proceso planificado para manejar y mitigar el impacto de incidentes de seguridad, incluyendo preparación, detección, contención, erradicación y recuperación.",
+        categoria: "Gestión"
+      },
+      {
+        termino: "Segmentación de red",
+        definicion: "División de una red en subredes más pequeñas para limitar el alcance de posibles ataques, contener amenazas y mejorar el rendimiento y gestión del tráfico.",
+        categoria: "Redes"
+      },
+      {
+        termino: "Seguridad por oscuridad",
+        definicion: "Enfoque de seguridad controvertido que confía en el secreto del diseño o implementación como principal método de protección, generalmente considerado insuficiente por sí solo.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Sello de confianza",
+        definicion: "Certificación visual que indica que un sitio web cumple con ciertos estándares de seguridad, privacidad o prácticas comerciales, otorgado por entidades independientes.",
+        categoria: "Web"
+      },
+      {
+        termino: "Sistemas de reputación",
+        definicion: "Mecanismos que evalúan y califican la confiabilidad de entidades (como IPs, dominios o usuarios) basados en su comportamiento histórico para identificar amenazas potenciales.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Suplantación de identidad",
+        definicion: "Técnica fraudulenta donde un atacante se hace pasar por una entidad legítima (mediante emails, sitios web falsos o comunicaciones) para robar información o credenciales.",
+        categoria: "Ataques"
+      },
+      {
+        termino: "Túnel",
+        definicion: "Conexión cifrada entre dos puntos que permite transmitir datos de forma segura a través de redes no confiables, implementado mediante protocolos como VPN, SSH o SSL/TLS.",
+        categoria: "Redes"
+      },
+      {
+        termino: "URL",
+        definicion: "Localizador Uniforme de Recursos, dirección que identifica recursos en internet. Las URL pueden ser manipuladas en ataques de phishing para engañar a usuarios.",
+        categoria: "Web"
+      },
+      {
+        termino: "UTM (Unified Threat Management)",
+        definicion: "Solución de seguridad que combina múltiples funciones como cortafuegos, antivirus, filtrado web y prevención de intrusiones en un solo dispositivo o servicio.",
+        categoria: "Seguridad"
+      },
+      {
+        termino: "Virtualización",
+        definicion: "Tecnología que permite ejecutar múltiples sistemas operativos o instancias de software en una sola máquina física, mejorando utilización de recursos pero introduciendo nuevos vectores de ataque.",
+        categoria: "Tecnología"
+      },
+      {
+        termino: "Virus",
+        definicion: "Tipo de malware que se replica insertando copias de sí mismo en otros programas o documentos, requiriendo interacción humana para propagarse y ejecutarse.",
+        categoria: "Malware"
+      },
+      {
+        termino: "VLAN",
+        definicion: "Red de área local virtual que agrupa dispositivos lógicamente aunque no estén físicamente en el mismo segmento de red, mejorando seguridad y gestión del tráfico.",
+        categoria: "Redes"
+      },
+      {
+        termino: "VoIP",
+        definicion: "Voz sobre Protocolo de Internet, tecnología para transmitir llamadas de voz a través de redes IP, susceptible a ataques como eavesdropping o denegación de servicio.",
+        categoria: "Redes"
+      },
+      {
+        termino: "VPN",
+        definicion: "Red Privada Virtual que extiende una red privada a través de una red pública como internet, permitiendo a usuarios enviar y recibir datos como si estuvieran conectados directamente a la red privada con cifrado para confidencialidad.",
+        categoria: "Redes"
+      },
+      {
+        termino: "Vulnerabilidad",
+        definicion: "Debilidad en un sistema que puede ser explotada para comprometer su seguridad, resultando de errores de diseño, implementación o configuración.",
+        categoria: "Vulnerabilidades"
+      },
+      {
+        termino: "Watering hole",
+        definicion: "Técnica de ataque donde se comprometen sitios web frecuentados por el grupo objetivo, infectando sus dispositivos cuando visitan estos sitios 'envenenados'.",
+        categoria: "Ataques"
+      },
+      {
+        termino: "WEP",
+        definicion: "Wired Equivalent Privacy, protocolo de seguridad obsoleto para redes WiFi con vulnerabilidades conocidas que permiten su descifrado en minutos, reemplazado por WPA y WPA2.",
+        categoria: "Redes"
+      },
+      {
+        termino: "WPA",
+        definicion: "Wi-Fi Protected Access, protocolo de seguridad para redes inalámbricas que reemplazó a WEP. WPA2 (con AES) es actualmente el estándar, con WPA3 introduciendo mejoras adicionales.",
+        categoria: "Redes"
+      }
+    ];
+
+    const glosario = document.getElementById("glosario");
+
+    function crearGlosario() {
+      glosario.innerHTML = "";
+      
+      terminos.forEach(termino => {
+        const card = document.createElement("div");
+        card.className = "termino-card";
+        card.innerHTML = `
+          <div class="termino-header">
+            <span class="termino-title">${termino.termino}</span>
+            <span class="termino-icon">▼</span>
+          </div>
+          <div class="termino-content">
+            <p class="termino-definicion">${termino.definicion}</p>
+            <span class="termino-categoria">${termino.categoria}</span>
+          </div>
+        `;
+        glosario.appendChild(card);
+      });
+
+      document.querySelectorAll('.termino-header').forEach(header => {
+        header.addEventListener('click', () => {
+          const card = header.parentElement;
+          card.classList.toggle('active');
+        });
+      });
+    }
+
+    document.getElementById("search").addEventListener("input", function() {
+      const filtro = this.value.toLowerCase();
+      let resultadosEncontrados = false;
+      
+      document.querySelectorAll('.termino-card').forEach(card => {
+        const termino = card.querySelector('.termino-title').textContent.toLowerCase();
+        const definicion = card.querySelector('.termino-definicion').textContent.toLowerCase();
+        
+        if (termino.includes(filtro) || definicion.includes(filtro)) {
+          card.style.display = "block";
+          resultadosEncontrados = true;
+        } else {
+          card.style.display = "none";
+        }
+      });
+      
+      const noResults = document.querySelector('.no-results');
+      if (!resultadosEncontrados && filtro.length > 0) {
+        if (!noResults) {
+          const noResultsDiv = document.createElement("div");
+          noResultsDiv.className = "no-results";
+          noResultsDiv.textContent = "No se encontraron resultados para tu búsqueda.";
+          glosario.appendChild(noResultsDiv);
+        }
+      } else if (noResults) {
+        noResults.remove();
+      }
+    });
+
+    crearGlosario();
+  </script>
+</body>
+</html>
